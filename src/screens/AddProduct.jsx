@@ -1,0 +1,119 @@
+import React, { useState } from "react";
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Keyboard,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../utils/firebase";
+
+export default function AddProduct() {
+  const [nombre, setNombre] = useState();
+  const [cantidad, setCantidad] = useState();
+  const [precio, setPrecio] = useState();
+  const [urlImagen, setUrlImagen] = useState();
+  const [descripcion, setDescripcion] = useState();
+
+  const handlePostRequest = async () => {
+    try {
+      const colecctionRef = collection(db, "Products");
+
+      const postData = {
+        nombre: nombre,
+        cantidad: cantidad,
+        precio: precio,
+        urlImagen: urlImagen,
+        descripcion: descripcion
+      };
+
+      const docRef = await addDoc(colecctionRef, postData);
+
+      alert("Producto agreagado con exito", docRef.id);
+
+      setCantidad(0);
+      setDescripcion("");
+      setNombre("");
+      setPrecio(0);
+      setUrlImagen("");
+    } catch (error) {
+      alert("Error al agregar producto", error);
+    }
+  };
+
+  const sendForm = () => {
+    if (nombre && cantidad && precio && urlImagen && descripcion) {
+      handlePostRequest();
+    } else {
+      alert("Necesitas rellenar todos los campos");
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      activeOpacity={1}
+      className="justify-center items-center"
+      onPress={() => Keyboard.dismiss()}
+    >
+      <SafeAreaView className="px-4 w-full h-full">
+        <Text className="font-bold text-xl mb-2">
+          {" "}
+          Agregar nuevo producto{" "}
+        </Text>
+        <View className="bg-slate-100 rounded-xl px-4 w-full h-auto shadow-xl items-center justify-center space-y-12 py-8">
+          <View className="space-y-2 w-full">
+            <Text className="font-bold">Nombre del producto:</Text>
+            <TextInput
+              className="border border-1 border-amber-500 rounded-xl w-full h-8 px-2"
+              value={nombre}
+              onChangeText={(text) => setNombre(text)}
+            />
+          </View>
+          <View className="space-y-2 w-full">
+            <Text className="font-bold">Precio:</Text>
+            <TextInput
+              className="border border-1 border-amber-500 rounded-xl w-full h-8 px-2"
+              keyboardType="numeric"
+              value={precio}
+              onChangeText={(text) => setPrecio(text)}
+            />
+          </View>
+          <View className="space-y-2 w-full">
+            <Text className="font-bold">Url de la imagen :</Text>
+            <TextInput
+              className="border border-1 border-amber-500 rounded-xl w-full h-8 px-2"
+              value={urlImagen}
+              onChangeText={(text) => setUrlImagen(text)}
+            />
+          </View>
+          <View className="space-y-2 w-full">
+            <Text className="font-bold">Cantidad disponible:</Text>
+            <TextInput
+              className="border border-1 border-amber-500 rounded-xl w-full h-8 px-2"
+              keyboardType="numeric"
+              value={cantidad}
+              onChangeText={(text) => setCantidad(text)}
+            />
+          </View>
+          <View className="space-y-2 w-full">
+            <Text className="font-bold">Descripcion:</Text>
+            <TextInput
+              className="border border-1 border-amber-500 rounded-xl w-full h-16 px-2"
+              value={descripcion}
+              onChangeText={(text) => setDescripcion(text)}
+            />
+          </View>
+          <View className="bg-amber-400 rounded-full w-full items-center py-4">
+            <TouchableOpacity onPress={sendForm}>
+              <Text className="font-bold text-white text-md">
+                Agregar Productos
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    </TouchableOpacity>
+  );
+}
